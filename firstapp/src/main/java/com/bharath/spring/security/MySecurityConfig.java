@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 public class MySecurityConfig {
@@ -65,10 +66,6 @@ public class MySecurityConfig {
 		return userDetailsService;
 	}
 
-	// Method:
-	//@Bean
-	//UserDetailsService userDetailsService(BCryptPasswordEncoder encoder)
-
 	//Declares a Spring Bean of type UserDetailsService, which is responsible for retrieving user information for authentication.
 	//It takes a BCryptPasswordEncoder as a parameter, which will be used to securely hash the password.
 	//This bean is typically used in Spring Security to authenticate users.
@@ -107,9 +104,39 @@ public class MySecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		
-		http.httpBasic(Customizer.withDefaults());
+		 http.httpBasic(Customizer.withDefaults());
+		// Questa riga abilita l'autenticazione HTTP Basic.
+		 // un metodo di autenticazione senza interfaccia grafica, dove:
+		//Il browser mostra un popup nativo chiedendo username e password.
+		//Le credenziali sono inviate in ogni richiesta HTTP tramite l'header Authorization.
+		// Quando usarlo?
+		//App REST o API backend.
+		//Ambienti interni o sviluppo
+		//Test rapido di sicurezza.
+
+		http.addFilterBefore(new MySecurityFilter(), BasicAuthenticationFilter.class);
+		// si usa con http.httpBasic() e non con http.formLogin(Customizer.withDefaults());
+		// è usata in Spring Security per inserire un filtro personalizzato (MySecurityFilter) prima del filtro BasicAuthenticationFilter nella security filter chain.
+
+
+		// http.formLogin(Customizer.withDefaults());
+
+		// Questa riga abilita il form di login standard di Spring Security.
+		// formLogin mostra una pagina HTML di login quando un utente non autenticato accede a una risorsa protetta.
+		// Customizer.withDefaults() applica le impostazioni predefinite (pagina di login, parametri username/password, ecc.).
+		// Non serve configurare nulla a mano: Spring Security gestisce tutto automaticamente.
+		// Quando usarlo?
+		// Applicazioni web con frontend HTML.
+		// Vuoi una UI personalizzata per il login.
+		// Esperienza utente più completa.
+
 		http.authorizeHttpRequests(auth -> auth
-	            .anyRequest().authenticated());
+	            .anyRequest().authenticated()); // Questa riga configura le autorizzazioni per le richieste HTTP.
+		                                       // La chiamata anyRequest().authenticated() significa che tutte le richieste HTTP devono essere autenticate.
+
+		http.authorizeHttpRequests(auth -> auth
+				.requestMatchers("/hello").authenticated()); // La chiamata .requestMatchers("/hello").authenticated() indica che solo le richieste
+		                                                             // HTTP verso l’endpoint /hello devono essere autenticate.
 		return http.build();
 	}
 
