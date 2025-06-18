@@ -134,9 +134,9 @@ public class MySecurityConfig {
 	            .anyRequest().authenticated()); // Questa riga configura le autorizzazioni per le richieste HTTP.
 		                                       // La chiamata anyRequest().authenticated() significa che tutte le richieste HTTP devono essere autenticate.
 
-		http.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/hello").authenticated()); // La chiamata .requestMatchers("/hello").authenticated() indica che solo le richieste
-		                                                             // HTTP verso l’endpoint /hello devono essere autenticate.
+//		http.authorizeHttpRequests(auth -> auth
+//				.requestMatchers("/hello").authenticated()); // La chiamata auth.requestMatchers("/hello").authenticated() indica che solo le richieste
+//		                                                             // HTTP verso l’endpoint /hello devono essere autenticate.
 		return http.build();
 	}
 
